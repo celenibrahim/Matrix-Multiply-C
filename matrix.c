@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <omp.h> // Burada OpenMP zaman ölçümü için gereken başlık
+#include <omp.h>
 #include <time.h>
 
 void read_matrix(const char *filename, int ***matrix, int *rows, int *cols) {
@@ -67,7 +67,6 @@ int main() {
     int **A, **B, **C_serial, **C_parallel;
     int A_rows, A_cols, B_rows, B_cols;
 
-    // Matrisleri dosyalardan oku
     read_matrix("matrix_a.txt", &A, &A_rows, &A_cols);
     read_matrix("matrix_b.txt", &B, &B_rows, &B_cols);
 
@@ -76,7 +75,6 @@ int main() {
         exit(1);
     }
 
-    // Sonuç matrislerini oluştur
     C_serial = (int **)malloc(A_rows * sizeof(int *));
     C_parallel = (int **)malloc(A_rows * sizeof(int *));
     for (int i = 0; i < A_rows; i++) {
@@ -84,7 +82,6 @@ int main() {
         C_parallel[i] = (int *)malloc(B_cols * sizeof(int));
     }
 
-    // Seri çarpım
     double start = omp_get_wtime();
     matrix_multiply_serial(A, B, C_serial, A_rows, A_cols, B_cols);
     double end = omp_get_wtime();
@@ -92,7 +89,6 @@ int main() {
 
     printf("Seri matris çarpımı süresi: %f saniye\n", serial_time);
 
-    // Paralel çarpım
     start = omp_get_wtime();
     matrix_multiply_parallel(A, B, C_parallel, A_rows, A_cols, B_cols);
     end = omp_get_wtime();
@@ -100,10 +96,8 @@ int main() {
 
     printf("Paralel matris çarpımı süresi: %f saniye\n", parallel_time);
 
-    // Paralel sonuçları dosyaya yaz
     write_matrix_to_file("sonuclar.txt", C_parallel, A_rows, B_cols);
 
-    // Bellek temizliği
     for (int i = 0; i < A_rows; i++) {
         free(A[i]);
         free(C_serial[i]);
